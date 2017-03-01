@@ -1,0 +1,11 @@
+.msg {
+  display: flex;
+  justify-content: center;
+}
+
+.msgbad {
+  color: red;
+}
+.msggood {
+  color: green;
+}

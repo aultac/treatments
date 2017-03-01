@@ -1,0 +1,22 @@
+.treatmentdatebar{
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex-grow: 1;
+  min-height: 2.2em;
+}
+
+.treatmentdateinput {
+  text-align: center;
+  flex-grow: 1;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+}
+
+.treatmentstring {
+  text-align: center;
+  flex-grow: 1;
+  font-weight: bold;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+}

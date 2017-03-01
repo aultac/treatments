@@ -6,6 +6,15 @@
     "react-scripts": "0.9.3"
   },
   "dependencies": {
+    "bluebird": "^3.4.7",
+    "cerebral": "^1.1.2",
+    "cerebral-module-devtools": "^0.7.2",
+    "cerebral-module-http": "^0.5.0",
+    "cerebral-provider-modules": "^0.1.2",
+    "cerebral-view-react": "^0.12.12",
+    "lodash": "^4.17.4",
+    "moment": "^2.17.1",
+    "pure-css": "^1.0.4",
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
   },

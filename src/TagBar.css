@@ -1,0 +1,39 @@
+.tagbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 3px;
+  border: 2px solid #DDDDDD;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.colortext {
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: center;
+  border-radius: 5px;
+  border-width: 5px;
+  border-style: solid;
+  font-weight: bold;
+  text-shadow: 1px 1px rgba(0,0,0,.3);
+  font-size: 1.5em;
+  width: 50%;
+}
+
+.numbertext {
+  flex-grow: 1;
+  flex-shink: 1;
+  text-align: center;
+  border: 0px;
+  border-radius: 5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: white;
+  font-weight: bold;
+  font-size: 1.5em;
+  width: 50%;
+}
+
+
+

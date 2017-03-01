@@ -1,0 +1,16 @@
+.colorbar {
+  display: flex;
+  min-height: 2.5em;
+}
+
+.colorbutton {
+  flex-grow: 1;
+  margin-right: 0.5vw;
+  margin-left: 0.5vw;
+  border-radius: 5px;
+  box-shadow: 1px 1px grey;
+}
+.colorbutton:hover {
+  cursor: pointer;
+}
+
