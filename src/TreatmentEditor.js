@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'cerebral-view-react';
 import _ from 'lodash';
+import moment from 'moment';
 
 import './TreatmentEditor.css';
 
@@ -39,9 +40,21 @@ export default connect({
     props.recordUpdateRequested({ treatment: textFromCodelist(list) });
   };
 
+  const recentCodesFromRecords = () => {
+    const sorted = _.sortBy(props.treatmentRecords,[r=>(-1*moment(r.date,'YYYY-MM-DD'))]);
+    return _.reduce(sorted,(acc,r) => {
+      if (acc.length >= 13) return acc; // only get 5 most recent
+      if (_.includes(acc,r.treatment)) return acc;
+  console.log('did not find treatment ',r.treatment,' in acc ', acc);
+      acc.push(r.treatment);
+      return acc;
+    },[]);
+  }
+  const recentTreatmentClicked = t => evt => props.recordUpdateRequested({treatment: t});
+
   const treatmentEditorDoneClicked = evt => props.hideTreatmentEditor();
   const codesOn = _.keyBy(codelistFromText(props.record.treatment),c=>c.code);
-
+  const recent = recentCodesFromRecords();
   return (
     <div className='treatmentEditor'>
       
@@ -66,6 +79,14 @@ export default connect({
       </div>
 
       <div className='recentTreatmentsList'>
+        <div className='recentText'>Recent: </div>
+        {_.map(recent, (t,i) =>
+          <div className='recentTreatmentsButton'
+               key={'recentTreatments'+i}
+               onClick={recentTreatmentClicked(t)}>
+            {t}
+          </div>
+        )}
       </div>
 
       <div className='treatmentEditorDoneButton'

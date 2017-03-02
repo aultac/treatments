@@ -16,11 +16,30 @@
 .recentTreatmentsList {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #CCCCCC;
+}
+.recentText {
+  font-size: 1.3em;
+  font-weight: bold;
 }
 
-.recentTreatmentButton {
+.recentTreatmentsButton:active {
+  background: linear-gradient(to top,#FFFFFF,#FAFAFA);
+}
+
+.recentTreatmentsButton {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  border: 2px solid #60ABF8;
+  box-shadow: 1px 1px #60ABF8;
+  border-radius: 3px;
+  font-size: 1.3em;
+  margin: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
+  background: linear-gradient(to bottom,#FFFFFF,#FAFAFA);
 }
 
 .treatmentCodesList {

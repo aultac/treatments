@@ -94,7 +94,7 @@ export function updateMsg({input,state}) {
 export function treatmentCardsToRecords({state}) {
   const cards = state.get('app.trello.treatmentcards');
   const records = _.map(cards, c => nameToRecord(c.name));
-  state.set('treatmentRecords', records);
+  state.set('app.treatmentRecords', records);
 }
 
 export function recordToTreatmentCardOutput({state,output}) {

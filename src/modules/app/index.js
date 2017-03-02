@@ -64,6 +64,7 @@ export default module => {
        WHITE: '#FFFFFF',
     },
 
+    treatmentRecords: [],
   });
 
   module.addSignals({
