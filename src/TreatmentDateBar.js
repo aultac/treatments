@@ -10,6 +10,7 @@ export default connect({
   treatmentCodes: 'app.treatmentCodes',
 },{
   recordUpdateRequested: 'app.recordUpdateRequested',
+  showTreatmentEditor: 'app.showTreatmentEditor',
 }, function RecordInput(props) {
 
   const dateChanged = evt => {
@@ -17,9 +18,9 @@ export default connect({
     props.recordUpdateRequested({date: moment(evt.target.value)});
   };
 
-  const treatmentTextChanged = evt => {
+  const treatmentTextClicked = evt => {
     evt.preventDefault();
-    props.recordUpdateRequested({treatment: evt.target.value});
+    props.showTreatmentEditor();
   };
 
   return (
@@ -31,7 +32,8 @@ export default connect({
       <input className='treatmentstring'
              value={props.record.treatment}
              type="text"
-             onChange={treatmentTextChanged} />
+             onClick={treatmentTextClicked}
+             onChange={treatmentTextClicked}/>
     </div>
   );
 });

@@ -13,6 +13,7 @@ export default connect({
   treatmentCodes: 'app.treatmentCodes',
   records: 'app.records',
   window: 'window',
+  canSave: 'app.trello.treatmentcardsValid',
 },{
   recordUpdateRequested: 'app.recordUpdateRequested',
   recordSaveClicked: 'app.recordSaveClicked',
@@ -35,8 +36,10 @@ export default connect({
   };
 
   const recordSaveClicked = evt => {
-    evt.preventDefault();
-    props.recordSaveClicked();
+    if (props.canSave) {
+      evt.preventDefault();
+      props.recordSaveClicked();
+    }
   };
 
   return (
@@ -50,7 +53,7 @@ export default connect({
               onClear={clearClicked}
               onBackspace={backspaceClicked} />
 
-      <div className="savebutton"
+      <div className={'savebutton ' + (props.canSave ? 'savebuttonenabled':'savebuttondisabled')}
            onClick={recordSaveClicked}>
         SAVE TREATMENT
       </div>

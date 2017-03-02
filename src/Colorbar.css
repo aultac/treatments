@@ -8,6 +8,7 @@
   margin-right: 0.5vw;
   margin-left: 0.5vw;
   border-radius: 5px;
+  border: 1px solid #CCCCCC;
   box-shadow: 1px 1px grey;
 }
 .colorbutton:hover {

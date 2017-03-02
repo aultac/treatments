@@ -1,0 +1,72 @@
+.treatmentEditor {
+  display: flex;
+  flex-direction: column;
+}
+
+.treatmentEditorTextInput {
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.recentTreatmentsList {
+  display: flex;
+  flex-direction: row;
+}
+
+.recentTreatmentButton {
+  display: flex;
+  justify-content: space-around;
+}
+
+.treatmentCodesList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.codeOn {
+  background-color: #097130;
+  color: #FFFFFF;
+  font-weight: bold;
+}
+
+.treatmentCodeButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid #CCCCCC;
+  box-shadow: 1px 1px grey;
+  border-radius: 3px;
+  font-size: 1.3em;
+  min-height:2em;
+  margin: 5px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
+}
+
+.treatmentEditorDoneButton:active {
+  color: white;
+  background: linear-gradient(to top, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+}
+.treatmentEditorDoneButton {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  flex-grow: 1;
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  font-size: 2em;
+  color: white;
+  background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+  margin-top: 10px;
+  margin-left: 5px;
+}
+.treatmentCodeButtonName {
+  font-weight: normal;
+}

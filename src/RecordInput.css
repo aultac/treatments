@@ -3,6 +3,15 @@
   flex-direction: column;
 }
 
+.savebuttonenabled {
+  color: white;
+  background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+}
+.savebuttondisabled {
+  color: #888888;
+  background: #CCCCCC;
+}
+
 .savebutton {
   display: flex;
   justify-content: center;
@@ -13,6 +22,4 @@
   border-radius: 5px;
   font-size: 1.8em;
   font-weight: bold;
-  color: white;
-  background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
 }
