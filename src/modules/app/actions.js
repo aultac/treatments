@@ -28,8 +28,6 @@ const recordToName = parts => {
 };
 
 
-
-
 export const waitTrelloExists = ({services,output}) => {
   let count = 0;
   const check = () => {
@@ -132,11 +130,17 @@ export function recordToTreatmentCardOutput({state,output}) {
 export function updateRecord({input,state}) {
   // if they are changing a record that has already been saved, go ahead and clear out
   // the textbox for them
+  if (state.get('app.record.is_saved')) { 
+    state.set('app.record.tag.number','');
+  }
   if (input.date)                    state.set('app.record.date', input.date);
   if (input.treatment)               state.set('app.record.treatment', input.treatment);
-  if (input.tag && 
-      typeof input.tag.color === 'string') state.set('app.record.tag.color', input.tag.color);
-  if (input.tag && 
-      typeof input.tag.number === 'string') state.set('app.record.tag.number', input.tag.number);
+  if (input.tag && typeof input.tag.color === 'string') {
+    state.set('app.record.tag.color', input.tag.color);
+    if (input.tag.color === 'NOTAG') state.set('app.record.tag.number','1');
+  }
+  if (input.tag && typeof input.tag.number === 'string') {
+    state.set('app.record.tag.number', input.tag.number);
+  }
   state.set('app.record.is_saved', false);
 }

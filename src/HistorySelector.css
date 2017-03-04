@@ -1,0 +1,22 @@
+.historyselector {
+  overflow: scroll;
+  display: flex;
+  flex-direction: row;
+}
+
+.historyselectorbutton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  min-height: 2em;
+  border: 1px solid #CCCCCC;
+  border-radius: 5px;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.historyselectorbuttonactive {
+  color: white;
+  background: linear-gradient(to bottom, #7abcff 0%,#60abf8 44%,#4096ee 100%);
+}

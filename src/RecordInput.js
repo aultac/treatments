@@ -20,8 +20,7 @@ export default connect({
 }, function RecordInput(props) {
 
   const numberClicked = num => {
-    // wipe out the previous entry if it's already been saved.
-    const prefix = (props.record.is_saved ? '' : props.record.tag.number);
+    const prefix = props.record.tag.number;
     props.recordUpdateRequested({tag: { number: prefix+''+num} });
   };
 

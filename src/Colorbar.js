@@ -25,6 +25,12 @@ export default connect({
                style={{backgroundColor: props.colors[c] }}>
           </div>
        )}
+       <div key={'colorNOTAG'}
+            className="colorbutton"
+            onClick={colorButtonClicked('NOTAG')}
+            style={{backgroundColor: '#CCCCCC'}}>
+        X
+      </div>
     </div>
   );
 

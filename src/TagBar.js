@@ -17,7 +17,7 @@ export default connect({
 
   const tagNumberTextChanged = evt => {
     evt.preventDefault();
-    props.recordUpdateRequested({tag: { color: evt.target.value} });
+    props.recordUpdateRequested({tag: { number: evt.target.value} });
   };
 
   const color = props.colors[props.record.tag.color];

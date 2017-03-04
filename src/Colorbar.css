@@ -5,6 +5,9 @@
 
 .colorbutton {
   flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-right: 0.5vw;
   margin-left: 0.5vw;
   border-radius: 5px;
