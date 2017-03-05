@@ -26,7 +26,7 @@ export default module => {
 
     treatmentEditorActive: false,
     historySelector: {
-      active: 'individual', // individual/date
+      active: 'date', // date/tag
     },
 
     msg: {
@@ -41,7 +41,7 @@ export default module => {
         color: '',
         number: '',
       },
-      is_saved: false,
+      is_saved: true,
     },
 
     treatmentCodes: [
@@ -75,7 +75,7 @@ export default module => {
     showTreatmentEditor: [ set('state:app.treatmentEditorActive',true) ],
     hideTreatmentEditor: [ set('state:app.treatmentEditorActive',false) ],
 
-    historySelectionChangeRequested: [ copy('input:active', 'state:app.historySelector:active'), ],
+    historySelectionChangeRequested: [ copy('input:active', 'state:app.historySelector.active'), ],
 
     recordUpdateRequested: {
       chain: [ updateRecord, updateMsg ],
@@ -90,6 +90,8 @@ export default module => {
           fail: [ msgFail('Could not put card to Trello!') ],
           success: [ 
             set('state:app.record.is_saved', true),
+            set('state:app.record.tag.number', ''),
+            set('state:app.historySelector.active', 'date'),
             msgSuccess('Saved card - wait for card list refresh'),
             [ //async
               fetchTreatmentCards, {

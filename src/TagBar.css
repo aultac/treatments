@@ -1,16 +1,16 @@
 .tagbar {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  flex-shrink: 0;
   border-radius: 3px;
   border: 2px solid #DDDDDD;
   padding-left: 5px;
   padding-right: 5px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 }
 
 .colortext {
-  flex-grow: 1;
-  flex-shrink: 1;
   text-align: center;
   border-radius: 5px;
   border-width: 5px;
@@ -22,8 +22,6 @@
 }
 
 .numbertext {
-  flex-grow: 1;
-  flex-shink: 1;
   text-align: center;
   border: 0px;
   border-radius: 5px;

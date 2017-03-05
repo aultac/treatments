@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'cerebral-view-react';
 
-import TagHistory from './TagHistory';
+import TagPane from './TagPane';
 import RecordInput from './RecordInput';
 import TreatmentEditor from './TreatmentEditor';
 
@@ -40,7 +40,7 @@ export default connect({
     }
     return (
       <div className="App" style={{ flexDirection: dir }}>
-        <TagHistory />
+        <TagPane />
         <RecordInput />
       </div>
     );

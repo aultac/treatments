@@ -41,11 +41,10 @@ export default connect({
   };
 
   const recentCodesFromRecords = () => {
-    const sorted = _.sortBy(props.treatmentRecords,[r=>(-1*moment(r.date,'YYYY-MM-DD'))]);
+    const sorted = _.reverse(_.sortBy(props.treatmentRecords,[ r => r.date, r => r.dateLastActivity ]));
     return _.reduce(sorted,(acc,r) => {
       if (acc.length >= 13) return acc; // only get 5 most recent
       if (_.includes(acc,r.treatment)) return acc;
-  console.log('did not find treatment ',r.treatment,' in acc ', acc);
       acc.push(r.treatment);
       return acc;
     },[]);

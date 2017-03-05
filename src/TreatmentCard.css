@@ -1,0 +1,40 @@
+.treatmentcard{
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  flex-shrink: 0;
+  border: 1px solid #CCCCCC;
+  width: 90%;
+  padding: 5px 5px 5px 5px;
+  margin-bottom: 5px;
+  box-shadow: 2px 2px 1px #999999;
+}
+
+.treatmentcardcount{
+  font-weight: bold;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.treatmentcardtreatment {
+  border: 1px solid #CCCCCC;
+  border-radius: 3px;
+  font-weight: bold;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.treatmentcardtags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.treatmentcardtag {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+

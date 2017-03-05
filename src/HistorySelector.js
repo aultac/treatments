@@ -8,17 +8,18 @@ export default connect({
 },{
   historySelectionChangeRequested: 'app.historySelectionChangeRequested',
 }, props => {
-  const       dateClicked = evt => props.historySelectionChangeRequested({ active: 'individual' });
-  const individualClicked = evt => props.historySelectionChangeRequested({ active: 'date'       });
+  const dateClicked = evt => props.historySelectionChangeRequested({ active: 'date' });
+  const  tagClicked = evt => props.historySelectionChangeRequested({ active: 'tag' });
+
   return (
     <div className="historyselector">
-      <div className={'historyselectorbutton ' + (props.historySelector.active === 'individual' ? 'historyselectorbuttonactive' : '')}
+      <div className={'historyselectorbutton ' + (props.historySelector.active === 'date' ? 'historyselectorbuttonactive' : '')}
            onClick={dateClicked}>
         Date
       </div>
-      <div className={'historyselectorbutton ' + (props.historySelector.active === 'date' ? 'historyselectorbuttonactive' : '')}
-           onClick={individualClicked}>
-        Calf
+      <div className={'historyselectorbutton ' + (props.historySelector.active === 'tag' ? 'historyselectorbuttonactive' : '')}
+           onClick={tagClicked}>
+        Tag
       </div>
     </div>
   );

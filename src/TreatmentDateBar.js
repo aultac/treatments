@@ -1,6 +1,5 @@
 import React from 'react';
 import {connect} from 'cerebral-view-react';
-import moment from 'moment';
 import _ from 'lodash';
 
 import './TreatmentDateBar.css';
@@ -15,7 +14,7 @@ export default connect({
 
   const dateChanged = evt => {
     evt.preventDefault();
-    props.recordUpdateRequested({date: moment(evt.target.value)});
+    props.recordUpdateRequested({date: evt.target.value});
   };
 
   const treatmentTextClicked = evt => {

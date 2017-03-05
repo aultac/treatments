@@ -1,14 +1,14 @@
 .keypad {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   flex-grow: 1;
+  flex-shrink: 0;
 }
 
 .keypadrow {
   display: flex;
-  align-items: stretch;
   flex-grow: 1;
+  flex-shrink: 0;
 }
 
 .keypadbutton:hover {
@@ -20,6 +20,7 @@
 }
 .keypadbutton {
   flex-grow: 1;
+  flex-shrink: 0;
   min-width: 33%;
   display: flex;
   justify-content: center;
