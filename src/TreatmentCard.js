@@ -16,7 +16,7 @@ export default connect({
       <div className="treatmentcardtreatment">{props.record.treatment}</div>
       <div className="treatmentcardtags">
         {_.map(props.record.tags, (t,i) => 
-          <div className="treatmentcardtag">
+          <div className="treatmentcardtag" key={'treatmentcardtag'+i}>
             {t.color+t.number}
           </div>
         )}

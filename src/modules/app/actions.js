@@ -1,9 +1,7 @@
 import _ from 'lodash';
 
-import {nameToRecord,recordToName} from '../../lib/cards';
-
-// cheating for now until we take time to look it up by name.
-const TREATMENTSLISTID = '58af86081a496c60f951c7f5';
+import {nameToRecord,recordToName,
+        deadToRecord} from '../../lib/cards';
 
 export const waitTrelloExists = ({services,output}) => {
   let count = 0;
@@ -28,17 +26,53 @@ export const authorizeTrello = ({state,output,services}) => {
 authorizeTrello.async = true;
 authorizeTrello.outputs = [ 'success', 'fail' ];
 
-export const fetchTreatmentCards = ({output,services}) => {
-  // hack for now: Antibiotic Treatments list is 58af86081a496c60f951c7f5
-  return services.trello.get('lists/'+TREATMENTSLISTID+'/cards',{fields:'name,id,closed,dateLastActivity'})
-  .then(result => {
-    // filter any archived cards:
-    const onlyactive = _.filter(result, c => (!c.closed));
-    output.success({cards: onlyactive});
-  }).catch(err => output.fail({err}));
+export const fetchCardsFactory = list => { 
+  const ret = ({output,state,services}) => {
+    const listid = state.get('app.trello.lists.'+list+'.id');
+    if (!listid || listid === '') output.fail('Could not fetch '+list+' cards: '+list+' ID invalid');
+    return services.trello.get('lists/'+listid+'/cards',{fields:'name,id,closed,desc,dateLastActivity'})
+    .filter(c => c && !c.closed) // filter any archived cards
+    .then(cards => {
+      output.success({cards})
+    }).catch(err => output.fail({err}));
+  };
+  ret.async = true;
+  ret.outputs = [ 'success', 'fail' ];
+  ret.displayName='fetchCardsFactory('+list+')';
+  return ret;
 };
-fetchTreatmentCards.async = true;
-fetchTreatmentCards.outputs = [ 'success', 'fail' ];
+
+export const fetchLivestockListIds = ({output,state,services}) => {
+  return services.trello.get('members/me/boards',{fields:'name,id,closed'})
+  .filter(b => b && !b.closed)
+  .then(result => {
+    const livestockboard = _.find(result, b => b.name === 'Livestock');
+    if (!livestockboard) throw new Error('Could not find livestock board');
+    return services.trello.get('boards/'+livestockboard.id+'/lists',{fields:'name,id,closed'})
+  })
+  .filter(l => l && !l.closed)
+  .then(result => {
+    const lists = [ 
+      { trelloName: 'Treatments', key: 'treatments' },
+      { trelloName:       'Dead', key: 'dead'       },
+      { trelloName:     'Config', key: 'config'     },
+      { trelloName:         'In', key: 'incoming'   },
+    ];
+    const ret = _.reduce(lists, (acc,listinfo) => {
+      const list = _.find(result, l => l.name === listinfo.trelloName);
+      if (!list) throw new Error('Could not find '+listinfo.trelloName+' list!');
+      acc[listinfo.key] = list.id;
+      return acc;
+    },{});
+    output.success({listids: ret});
+  }).catch(err => {
+    console.log('Failed in getting lists.  Full error = ', err);
+    output.fail({ err });
+  });
+};
+fetchLivestockListIds.async = true;
+fetchLivestockListIds.outputs = [ 'success', 'fail' ];
+
 
 export const putTreatmentCardName = ({input,output,services}) => {
   const tc = input.treatmentcard;
@@ -66,21 +100,55 @@ export function updateMsg({input,state}) {
   state.set('app.msg', { type: 'bad', text: 'Treatment record not saved'});
 }
 
-export function treatmentCardsToRecords({state}) {
-  const cards = state.get('app.trello.treatmentcards');
-  const records = _.map(cards, c => {
-    const r = nameToRecord(c.name);
-    r.dateLastActivity = c.dateLastActivity;
-    r.id = c.id;
-    r.idList = c.idList;
+const cardMappers = {
+  treatments: c => nameToRecord(c.name),
+  config: c => {
+    if (c.name === 'Treatment Types') {
+      return { type: 'treatment_types', codes: JSON.parse(c.desc) };
+    }
+    if (c.name === 'Tag Colors') {
+      return { type: 'tag_colors', colors: JSON.parse(c.desc) };
+    }
+  },
+  dead: c => deadToRecord(c.name),
+  incoming: c => { return {};
+    // TODO
+  },
+};
+
+export const cardsToRecordsFactory = list => ({state}) => {
+  const cards = state.get('app.trello.lists.'+list+'.cards');
+  let records = _.map(cards, c => {
+    let r = null;
+    try {
+      r = cardMappers[list](c);
+    } catch(err) { 
+      console.log('Error in mapping card '+c.name+' to record for list '+list+', c.desc = '+c.desc+',  err = ', err);
+      state.set('app.msg', { type: 'bad', text: 'Failed to read card '+c.name+' from list '+list+', desc = '+c.desc})
+    }
+    if (r) {
+      r.dateLastActivity = c.dateLastActivity;
+      r.id = c.id;
+      r.idList = c.idList;
+    } else {
+      console.log('Unable to convert name to record in list '+list+'.  c.name = ', c.name);
+    }
     return r;
   });
-  state.set('app.treatmentRecords', records);
+  if (list === 'config') { // config is special
+    const treatmenttypes = _.find(records,r => r.type === 'treatment_types');
+    const      tagcolors = _.find(records,r => r.type === 'tag_colors');
+    if (treatmenttypes) state.set('app.treatmentCodes', treatmenttypes.codes);
+    if (tagcolors)      state.set('app.colors', tagcolors.colors);
+    return;
+  }
+  // all other types of records just get end up in app.records
+  state.set('app.records.'+list, records);
 }
 
 export function recordToTreatmentCardOutput({state,output}) {
 
-  const cards = state.get('app.trello.treatmentcards');
+  const cards = state.get('app.trello.lists.treatments.cards');
   const record = state.get('app.record');
   // Look for a card that matches this one's date and treatment:
   const putcard = _.find(cards, c => {
@@ -90,7 +158,7 @@ export function recordToTreatmentCardOutput({state,output}) {
     return true;
   });
   const ret = _.cloneDeep(record);
-  ret.idList = TREATMENTSLISTID;
+  ret.idList = state.get('app.trello.lists.treatments.id');
   ret.tags = [];
   if (putcard) {
     const putcardinfo = nameToRecord(putcard.name);
@@ -127,5 +195,13 @@ export function updateRecord({input,state}) {
   }
   state.set('app.record.is_saved', false);
 }
+
+// Handy wrappers:
+export const msgFail = (msg) => ({input,state}) => {
+  state.set('app.msg', { type: 'bad', text: msg + ': err = ' + input.err });
+};
+export const msgSuccess = (msg) => ({input,state}) => {
+  state.set('app.msg', { type: 'good', text: msg });
+};
 
 

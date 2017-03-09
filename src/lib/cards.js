@@ -24,5 +24,44 @@ export function recordToName(parts) {
         +_.join(_.map(parts.tags, t=>t.color+t.number), ' ')
 };
 
-
+export function deadToRecord(name) {
+  let matches = name.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}):?(.*)$/);
+  const day = matches[1];
+  let tags_and_pens_str = matches[2];
+  // Ditch anything in parentheses:
+  tags_and_pens_str = tags_and_pens_str.replace(/\(.*\)/g,'');
+  let tags_and_pens = tags_and_pens_str.match(/([A-Za-z']+ ?([0-9]+)?)/g);
+  tags_and_pens = _.map(tags_and_pens, tp => tp.trim());
+  tags_and_pens = _.map(tags_and_pens, tp => ( tp==='NT' ? 'NOTAG1' : tp));
+  // eliminate everything that isn't just tags
+  let tags = _.filter(tags_and_pens, t => 
+    !t.match(/^[NSB][0-9S]{1,2}$/i) && // N1, NS, S1, B3
+    !t.match(/^OB[SN]?[NS]?$/) && // OBS, OBN, OB, OBNS
+    !t.match(/^HB$/i) &&
+    !t.match(/^HEIFER$/i) &&
+    !t.match(/^DRY( ?(LOT|COW))?$/i) && 
+    !t.match(/^DAIRY$/i) && 
+    !t.match(/^APRIL'?S?$/i) && 
+    !t.match(/^WOODS$/i) &&
+    !t.match(/^BARN ?[1-3]$/i) &&
+    !t.match(/^dead/i) &&
+    !t.match(/^total/i) && 
+    !t.match(/^and/i)
+  );
+  // fixup bad tags:
+  tags = _.map(tags, t=>t.toUpperCase().replace(/ /g,''));
+  tags = _.map(tags, t=>(t === 'NOTAG' ? 'NOTAG1' : t));
+  // parse all the tag strings into tag objects
+  tags = _.map(tags, t=> {
+    const matches = t.match(/^([A-Z]+)([0-9]+)/);
+    return {
+      color: matches[1],
+      number: matches[2],
+    };
+  });
+  return {
+    date: day,
+    tags: tags,
+  };
+}
 

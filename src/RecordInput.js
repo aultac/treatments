@@ -11,9 +11,7 @@ export default connect({
   record: 'app.record',
   colors: 'app.colors',
   treatmentCodes: 'app.treatmentCodes',
-  records: 'app.records',
-  window: 'window',
-  canSave: 'app.trello.treatmentcardsValid',
+  canSave: 'app.trello.lists.treatments.cardsValid',
 },{
   recordUpdateRequested: 'app.recordUpdateRequested',
   recordSaveClicked: 'app.recordSaveClicked',

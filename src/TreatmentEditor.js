@@ -7,7 +7,7 @@ import './TreatmentEditor.css';
 export default connect({
   record: 'app.record',
   treatmentCodes: 'app.treatmentCodes',
-  treatmentRecords: 'app.treatmentRecords',
+  treatmentRecords: 'app.records.treatments',
 },{
   recordUpdateRequested: 'app.recordUpdateRequested',
   hideTreatmentEditor: 'app.hideTreatmentEditor',

@@ -10,11 +10,11 @@ export default connect({
 }, class Keypad extends React.Component {
 
   keypressed(evt) {
-    if (evt.keycode === 8) {
+    if (evt.keyCode === 8) {
       this.props.onBackspace(); // backspace
       evt.preventDefault();
     }
-    const number = evt.keycode - 48; // 0 is key 48
+    const number = evt.keyCode - 48; // 0 is key 48
     if (number >= 0 && number <=9) {
       this.props.onNumber(number);
       evt.preventDefault();

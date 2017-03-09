@@ -3,30 +3,27 @@ import moment from 'moment';
 import { set,copy } from 'cerebral/operators';
 
 import { updateRecord,recordToTreatmentCardOutput,
-         updateMsg, authorizeTrello, waitTrelloExists,
-         fetchTreatmentCards, putTreatmentCardName,
-         treatmentCardsToRecords } from './actions';
+         updateMsg, putTreatmentCardName,
+         msgFail, msgSuccess } from './actions';
 
-// Handy wrappers:
-const msgFail = (msg) => ({input,state}) => {
-  state.set('app.msg', { type: 'bad', text: msg + ': err = ' + input.err });
-};
-const msgSuccess = (msg) => ({input,state}) => {
-  state.set('app.msg', { type: 'good', text: msg });
-};
+import { chainFetchTreatmentCards, chainDoAuthorization } from './chains';
 
 export default module => {
   module.addState({
 
     trello: {
       authorized: false,
-      treatmentcards: [],
-      treatmentcardsValid: false,
+      lists: {
+        treatments: { id: '', cards: [], cardsValid: false, },
+              dead: { id: '', cards: [], cardsValid: false, },
+            config: { id: '', cards: [], cardsValid: false, },
+          incoming: { id: '', cards: [], cardsValid: false, },
+      },
     },
 
     treatmentEditorActive: false,
     historySelector: {
-      active: 'date', // date/tag
+      active: 'date', // date/tag/group/dead
     },
 
     msg: {
@@ -67,7 +64,12 @@ export default module => {
        WHITE: '#FFFFFF',
     },
 
-    treatmentRecords: [],
+    records: {
+      treatments: [],
+      dead: [],
+      incoming: [],
+    },
+
   });
 
   module.addSignals({
@@ -93,51 +95,13 @@ export default module => {
             set('state:app.record.tag.number', ''),
             set('state:app.historySelector.active', 'date'),
             msgSuccess('Saved card - wait for card list refresh'),
-            [ //async
-              fetchTreatmentCards, {
-                fail: [ msgFail('Failed to retrieve list of cards after save.') ],
-                success: [
-                  copy('input:cards', 'state:app.trello.treatmentcards'),
-                  treatmentCardsToRecords,
-                  set('state:app.trello.treatmentcardsValid', true),
-                  updateMsg 
-                ],
-              },
-            ],
+            chainFetchTreatmentCards,
           ],
         },
       ],
     ],
 
-    authorizationNeeded: [
-      [ // async:
-        waitTrelloExists, { 
-          fail: [ msgFail('Failed to load Trello library') ],
-          success: [ 
-            [ // async:
-              authorizeTrello, { 
-                fail: [ msgFail('Failed trello authorization') ],
-                success: [ 
-                  ({state}) => state.set('app.trello.authorized', true), 
-                  updateMsg,
-                  [ // async:
-                    fetchTreatmentCards, {
-                      success: [ 
-                        msgSuccess('Treatments loaded.'),
-                        copy('input:cards', 'state:app.trello.treatmentcards'),
-                        treatmentCardsToRecords,
-                        set('state:app.trello.treatmentcardsValid', true),
-                      ],
-                      fail: [ msgFail('Failed to load treatment cards') ],
-                    },
-                  ],
-                ],
-              },
-            ],
-          ],
-        },
-      ],
-    ],
+    authorizationNeeded: [ chainDoAuthorization ], // async, so don't ...expand
 
   });
 }
