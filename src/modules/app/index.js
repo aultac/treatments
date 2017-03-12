@@ -2,11 +2,12 @@ import moment from 'moment';
 
 import { set,copy } from 'cerebral/operators';
 
+import { treatmentCodes, colors } from './defaults';
 import { updateRecord,recordToTreatmentCardOutput,
          updateMsg, putTreatmentCardName,
          msgFail, msgSuccess } from './actions';
 
-import { chainFetchTreatmentCards, chainDoAuthorization } from './chains';
+import { chainFetchCards, chainDoAuthorization } from './chains';
 
 export default module => {
   module.addState({
@@ -41,28 +42,8 @@ export default module => {
       is_saved: true,
     },
 
-    treatmentCodes: [
-      { code: 'Z',  name: 'zuprevo' },
-      { code: 'Za', name: 'zactran' },
-      { code: 'N',  name: 'nuflor' },
-      { code: 'Ba', name: 'baytril' },
-      { code: 'No', name: 'noromycin' },
-      { code: 'P',  name: 'pennicillin' },
-      { code: 'S',  name: 'sulfa' },
-      { code: 'D',  name: 'dexamethasone' },
-      { code: 'R',  name: 'TDN rocket' },
-      { code: 'M',  name: 'maxi-b' },
-      { code: 'B',  name: 'banamine' },
-    ],
-
-    colors: { 
-      YELLOW: '#E9E602',
-       GREEN: '#02BB02',
-        BLUE: '#113E9C',
-         RED: '#E90202',
-      PURPLE: '#AE027F',
-       WHITE: '#FFFFFF',
-    },
+    treatmentCodes,
+    colors,
 
     records: {
       treatments: [],
@@ -95,13 +76,17 @@ export default module => {
             set('state:app.record.tag.number', ''),
             set('state:app.historySelector.active', 'date'),
             msgSuccess('Saved card - wait for card list refresh'),
-            chainFetchTreatmentCards,
+            chainFetchCards('treatments'),
           ],
         },
       ],
     ],
 
     authorizationNeeded: [ chainDoAuthorization ], // async, so don't ...expand
+    logoutClicked: [ 
+      ({state,services}) => { state.set('app.trello.authorized', false); services.trello.deauthorize(); },
+      chainDoAuthorization,
+    ],
 
   });
 }

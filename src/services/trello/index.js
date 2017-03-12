@@ -20,6 +20,9 @@ export default {
       });
     });
   },
+  deauthorize: () => {
+    return new Promise((resolve,reject) => { window.Trello.deauthorize(); resolve(); });
+  },
    get: (path,params)=> new Promise((resolve,reject) => window.Trello.get( path,params||{},resolve,err => { console.log('Trello.get ERROR: ', err); reject(err); })),
    put: (path,params)=> new Promise((resolve,reject) => window.Trello.put( path,params    ,resolve,err => { console.log('Trello.put ERROR: ', err); reject(err); })),
   post: (path,params)=> new Promise((resolve,reject) => window.Trello.post(path,params    ,resolve,err => { console.log('Trello.post ERROR: ',err); reject(err); })),

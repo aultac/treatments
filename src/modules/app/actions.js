@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import { treatmentCodes as defaultTreatmentCodes,
+         colors as defaultColors } from './defaults';
 
 import {nameToRecord,recordToName,
         deadToRecord} from '../../lib/cards';
@@ -43,24 +45,59 @@ export const fetchCardsFactory = list => {
 };
 
 export const fetchLivestockListIds = ({output,state,services}) => {
+  let livestockboard = null;
+  const lists = [ 
+    { trelloName: 'Treatments', key: 'treatments' },
+    { trelloName:       'Dead', key: 'dead'       },
+    { trelloName:     'Config', key: 'config'     },
+    { trelloName:         'In', key: 'incoming'   },
+  ];
+
   return services.trello.get('members/me/boards',{fields:'name,id,closed'})
   .filter(b => b && !b.closed)
   .then(result => {
     const livestockboard = _.find(result, b => b.name === 'Livestock');
-    if (!livestockboard) throw new Error('Could not find livestock board');
-    return services.trello.get('boards/'+livestockboard.id+'/lists',{fields:'name,id,closed'})
-  })
+    if (!livestockboard) {
+      console.log('Could not find Livestock board, creating it.');
+      return services.trello.post('boards', { name: 'Livestock' })
+    }
+    return livestockboard;
+  }).then(result => livestockboard = result)
+
+  // Now we should be guaranteed to have a Livestock board object in result
+  .then(result => services.trello.get('boards/'+livestockboard.id+'/lists',{fields:'name,id,closed'}))
   .filter(l => l && !l.closed)
+
+  // Now look for each list that we know about, and if it isn't there, try to create it...
+  .then(result => _.map(lists, listinfo => {
+    const list = _.find(result, l => l.name === listinfo.trelloName);
+    if (!list) {
+      console.log('Could not find '+listinfo.trelloName+' list in Livestock board.  Creating list...');
+      // If we're creating config, create the config cards too for reference.  Not the best since this
+      // only runs if the config list isn't there, but works for now.
+      if (listinfo.key === 'config') {
+        let configlist = null;
+        return services.trello.post('boards/'+livestockboard.id+'/lists', { 'name': listinfo.trelloName })
+        .then(result => {
+          configlist = result;
+          return [
+            services.trello.post('lists/'+result.id+'/cards', { name: 'Treatment Types', desc: JSON.stringify(defaultTreatmentCodes,false,'  ') }),
+            services.trello.post('lists/'+result.id+'/cards', { name:      'Tag Colors', desc: JSON.stringify(        defaultColors,false,'  ') }),
+          ];
+        }).map(c=>c)
+        .then(result => configlist)
+        .catch(err => { console.log('Failed to create TreatmentCodes or Colors cards after creating Config list.  err = ', err); throw err; });
+      }
+      return services.trello.post('boards/'+livestockboard.id+'/lists', { 'name': listinfo.trelloName });
+    }
+    return list;
+
+  // Now we should be guaranteed to have a list object for each list in result
+  })).map(l => l) // map each one so it will wait until the promise returns
   .then(result => {
-    const lists = [ 
-      { trelloName: 'Treatments', key: 'treatments' },
-      { trelloName:       'Dead', key: 'dead'       },
-      { trelloName:     'Config', key: 'config'     },
-      { trelloName:         'In', key: 'incoming'   },
-    ];
     const ret = _.reduce(lists, (acc,listinfo) => {
       const list = _.find(result, l => l.name === listinfo.trelloName);
-      if (!list) throw new Error('Could not find '+listinfo.trelloName+' list!');
+      if (!list) throw new Error('Could not find list '+listinfo.trelloName+' in Trello and I could not create it!');
       acc[listinfo.key] = list.id;
       return acc;
     },{});

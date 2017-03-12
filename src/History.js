@@ -2,10 +2,11 @@ import React from 'react';
 import {connect} from 'cerebral-view-react';
 import _ from 'lodash';
 
-import HistoryDate  from './HistoryDate';
-import HistoryTag   from './HistoryTag';
+import  HistoryDate from './HistoryDate';
+import   HistoryTag from './HistoryTag';
 import HistoryGroup from './HistoryGroup';
-import HistoryDead  from './HistoryDead';
+import  HistoryDead from './HistoryDead';
+import        Prefs from './Prefs';
 
 import './History.css';
 
@@ -21,6 +22,7 @@ export default connect({
     case   'tag': ret = <HistoryTag />;   break;
     case 'group': ret = <HistoryGroup />; break;
     case  'dead': ret = <HistoryDead />;  break;
+    case 'prefs': ret = <Prefs />;  break;
     default:
   }
   return ret;

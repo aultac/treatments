@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'cerebral-view-react';
+import FontAwesome from 'react-fontawesome';
 
 import './HistorySelector.css';
 
@@ -8,6 +9,7 @@ export default connect({
 },{
   historySelectionChangeRequested: 'app.historySelectionChangeRequested',
 }, props => {
+  const prefsClicked = evt => props.historySelectionChangeRequested({ active: 'prefs' });
   const  dateClicked = evt => props.historySelectionChangeRequested({ active: 'date' });
   const   tagClicked = evt => props.historySelectionChangeRequested({ active: 'tag' });
   const groupClicked = evt => props.historySelectionChangeRequested({ active: 'group' });
@@ -15,6 +17,10 @@ export default connect({
 
   return (
     <div className="historyselector">
+      <div className={'historyselectorbutton ' + (props.historySelector.active === 'prefs' ? 'historyselectorbuttonactive' : '')}
+           onClick={prefsClicked}>
+        <FontAwesome name='bars' />
+      </div>
       <div className={'historyselectorbutton ' + (props.historySelector.active === 'date' ? 'historyselectorbuttonactive' : '')}
            onClick={dateClicked}>
         Date
