@@ -21,7 +21,7 @@ export default connect({
   if (group) all_groups = [ group ]; // just show group for current tag
   all_groups = _.sortBy(all_groups, g => {
     if (props.sortBy === 'date') return g.day; // day string is lexicographic for sorting
-    if (props.sortBy === 'name') return g.name;
+    if (props.sortBy === 'name') return g.groupname;
     if (props.sortBy === 'dead') return g.dead;
     if (props.sortBy === 'perc') return (g.dead ? g.dead.length : 0) / (g.head ? g.head : 1);
     return g.day; // default

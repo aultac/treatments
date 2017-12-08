@@ -24,7 +24,7 @@ export default module => {
 
     treatmentEditorActive: false,
     historySelector: {
-      active: 'group', // date/tag/group/dead
+      active: 'date', // date/tag/group/dead
     },
     historyGroup: {
       sort: 'date', // date/name/dead/perc
