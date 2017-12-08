@@ -1,5 +1,11 @@
 import _ from 'lodash';
 
+export function tagStrToObj(str) {
+  const matches = str.trim().match(/^([A-Za-z]+) ?([0-9]+)?$/);
+  if (!matches) return { color: 'NOTAG', number: 1 };
+  return { color: matches[1], number: +(matches[2]) || 1 };
+}
+
 // Handy helper functions for translating card names to records and back
 export function nameToRecord(name)  {
   const datematches = name.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}):(.*)$/);
@@ -10,11 +16,7 @@ export function nameToRecord(name)  {
   if (!treatmentmatches || treatmentmatches.length < 3) return null;
   const treatment = treatmentmatches[1].trim();
   rest = treatmentmatches[2].trim();
-  const tags = _.map(_.split(rest,' '),t => {
-    const matches = t.trim().match(/^([A-Za-z]+) ?([0-9]+)?$/);
-    if (!matches) return { color: 'NOTAG', number: 'NOTAG' };
-    return { color: matches[1], number: matches[2] || 'NOTAG' };
-  });
+  const tags = _.map(_.split(rest,' '), tagStrToObj)
   return { date, treatment, tags };
 };
 
@@ -25,7 +27,7 @@ export function recordToName(parts) {
 };
 
 export function deadToRecord(name) {
-  let matches = name.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}):?(.*)$/);
+  let matches = name.match(/^([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}):?(.*)$/);
   const day = matches[1];
   let tags_and_pens_str = matches[2];
   // Ditch anything in parentheses:
@@ -52,16 +54,39 @@ export function deadToRecord(name) {
   tags = _.map(tags, t=>t.toUpperCase().replace(/ /g,''));
   tags = _.map(tags, t=>(t === 'NOTAG' ? 'NOTAG1' : t));
   // parse all the tag strings into tag objects
-  tags = _.map(tags, t=> {
-    const matches = t.match(/^([A-Z]+)([0-9]+)/);
-    return {
-      color: matches[1],
-      number: matches[2],
-    };
-  });
+  tags = _.map(tags, tagStrToObj);
   return {
     date: day,
     tags: tags,
   };
 }
 
+export function incomingToRecord(name) {
+  let matches = name.match(/^([0-9]{4}-[0-9]{2}-[0-9]{2}):? *([^;]+);(.*)$/);
+  const ret = {};
+  ret.day = matches[1];
+  ret.groupname = matches[2];
+  let rest = matches[3];
+  const parts = rest.split(';');
+  _.each(parts, p => {
+    const [propname,propval] = p.trim().split(':');
+    ret[propname.toLowerCase().trim()] = propval.trim();
+  });
+
+  // If there are tag range(s), parse that out as well
+  if (ret.tags) {
+    ret.tags = ret.tags.replace(/ /g,''); // get rid of any spaces
+    ret.tag_ranges = _.reduce(ret.tags.split(','), (acc,r) => { // each range turns into 1 or 2 objects depending on color split
+      const [start,end] = _.map(r.split('-'), tagStrToObj); // map start and end into objects
+      if (start.color !== end.color) {
+        acc.push({ start, end: { color: start.color, number: 1000 } });
+        acc.push({ start: { color: end.color, number: 1 }, end });
+        return acc;
+      }
+      acc.push({start,end});
+      return acc;
+    },[]);
+  }
+
+  return ret;
+}

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { set, copy} from 'cerebral/operators';
 import { updateMsg, msgFail, waitTrelloExists, authorizeTrello,
          fetchLivestockListIds,
-         fetchCardsFactory, cardsToRecordsFactory } from './actions'
+         fetchCardsFactory, cardsToRecordsFactory, statsFactory } from './actions'
 
 
 // Factory to return fetchCards for a particular list
@@ -12,6 +12,7 @@ export const chainFetchCards = list => [ //async
     success: [
       copy('input:cards', 'state:app.trello.lists.'+list+'.cards'),
       cardsToRecordsFactory(list),
+      statsFactory(list),
       set('state:app.trello.lists.'+list+'.cardsValid', true),
       updateMsg,
     ]

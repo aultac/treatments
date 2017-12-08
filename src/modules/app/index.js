@@ -24,20 +24,23 @@ export default module => {
 
     treatmentEditorActive: false,
     historySelector: {
-      active: 'date', // date/tag/group/dead
+      active: 'group', // date/tag/group/dead
+    },
+    historyGroup: {
+      sort: 'date', // date/name/dead/perc
     },
 
     msg: {
       type: 'bad',
-      text: 'Treatment record not saved.'
+      text: 'Treatment record not saved.',
     },
 
     record: {
       date: moment().format('YYYY-MM-DD'),
-      treatment: 'ZSDRMB',
+      treatment: 'NoExHt',
       tag: {
         color: '',
-        number: '',
+        number: 0,
       },
       is_saved: true,
     },
@@ -87,6 +90,8 @@ export default module => {
       ({state,services}) => { state.set('app.trello.authorized', false); services.trello.deauthorize(); },
       chainDoAuthorization,
     ],
+
+    historyGroupSortClicked: [ copy('input:sort', 'state:app.historyGroup.sort') ],
 
   });
 }

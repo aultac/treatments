@@ -11,25 +11,25 @@ export default connect({
   record: 'app.record',
   colors: 'app.colors',
   treatmentCodes: 'app.treatmentCodes',
-  canSave: 'app.trello.lists.treatments.cardsValid',
+  cardsValid: 'app.trello.lists.treatments.cardsValid',
 },{
   recordUpdateRequested: 'app.recordUpdateRequested',
   recordSaveClicked: 'app.recordSaveClicked',
 }, function RecordInput(props) {
 
   const numberClicked = num => {
-    const prefix = props.record.tag.number;
-    props.recordUpdateRequested({tag: { number: prefix+''+num} });
+    const prefix = '' + (props.record.tag.number || ''); // convert to string
+    props.recordUpdateRequested({tag: { number: prefix+num} });
   };
 
   const clearClicked = () => {
-    props.recordUpdateRequested({ tag: { number: '' } });
+    props.recordUpdateRequested({ tag: { number: '', color: '' } });
   };
 
   const backspaceClicked = () => {
-    let str = props.record.tag.number;
+    let str = ''+props.record.tag.number;
     if (str.length > 0) str = str.slice(0,-1);
-    props.recordUpdateRequested({ tag: { number: str } });
+    props.recordUpdateRequested({ tag: { number: +(str) } });
   };
 
   const recordSaveClicked = evt => {
@@ -39,6 +39,7 @@ export default connect({
     }
   };
 
+  const canSave = props.cardsValid && props.record.tag && props.record.tag.number && props.record.tag.color;
   return (
     <div className="recordinput">
 
@@ -50,7 +51,7 @@ export default connect({
               onClear={clearClicked}
               onBackspace={backspaceClicked} />
 
-      <div className={'savebutton ' + (props.canSave ? 'savebuttonenabled':'savebuttondisabled')}
+      <div className={'savebutton ' + (canSave ? 'savebuttonenabled':'savebuttondisabled')}
            onClick={recordSaveClicked}>
         SAVE TREATMENT
       </div>

@@ -1,0 +1,36 @@
+.historygroup {
+  overflow-y: scroll;
+}
+
+.historygroupgood {
+  color: green;
+  font-weight: bold;
+}
+.historygroupmeh {
+  color: black;
+}
+.historygroupbad {
+  color: red;
+}
+
+.historygroupname {
+  text-align: right;
+  padding-right: 10px;
+}
+.historygroupnamepill {
+  border: 1px solid darkgray;
+  border-radius: 2px;
+}
+
+.historygroupdate {
+  text-align: right;
+}
+
+.historygroupdead {
+  text-align: right;
+}
+
+.historygroupperc {
+  text-align: right;
+  padding-right: 2px;
+}

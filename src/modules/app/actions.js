@@ -3,7 +3,9 @@ import { treatmentCodes as defaultTreatmentCodes,
          colors as defaultColors } from './defaults';
 
 import {nameToRecord,recordToName,
-        deadToRecord} from '../../lib/cards';
+        deadToRecord, incomingToRecord } from '../../lib/cards';
+
+import {rangeContainsTag} from '../../lib/records';
 
 export const waitTrelloExists = ({services,output}) => {
   let count = 0;
@@ -148,9 +150,7 @@ const cardMappers = {
     }
   },
   dead: c => deadToRecord(c.name),
-  incoming: c => { return {};
-    // TODO
-  },
+  incoming: c => incomingToRecord(c.name),
 };
 
 export const cardsToRecordsFactory = list => ({state}) => {
@@ -160,15 +160,16 @@ export const cardsToRecordsFactory = list => ({state}) => {
     try {
       r = cardMappers[list](c);
     } catch(err) { 
-      console.log('Error in mapping card '+c.name+' to record for list '+list+', c.desc = '+c.desc+',  err = ', err);
+      console.log('Error in mapping card ',c,' to record for list '+list+', c.desc = '+c.desc+',  err = ', err);
       state.set('app.msg', { type: 'bad', text: 'Failed to read card '+c.name+' from list '+list+', desc = '+c.desc})
     }
     if (r) {
       r.dateLastActivity = c.dateLastActivity;
       r.id = c.id;
       r.idList = c.idList;
+      r.cardName = c.name;
     } else {
-      console.log('Unable to convert name to record in list '+list+'.  c.name = ', c.name);
+      console.log('WARNING: Unable to convert name to record in list '+list+'.  c.name = ', c.name);
     }
     return r;
   });
@@ -181,6 +182,42 @@ export const cardsToRecordsFactory = list => ({state}) => {
   }
   // all other types of records just get end up in app.records
   state.set('app.records.'+list, records);
+}
+
+export const statsFactory = list => ({state}) => {
+  if (list !== 'dead' && list !== 'incoming') return; // only running dead stats by group at the moment
+  // check if we have both dead and incoming records:
+  const deadrecords = state.get('app.records.dead');
+  const incoming = state.get('app.records.incoming');
+  if (!deadrecords || !incoming) {
+    console.log('statsFactory: We do not have both dead and incoming yet');
+    return;
+  }
+
+  // Organize the dead by tag color:
+  const dead = _.reduce(deadrecords, (acc,d) => {
+    if (!d.tags) {
+      console.log('WARNING: dead record has no tags.  Card name = ', d.cardName);
+    }
+    _.each(d.tags, t => {
+      if (!acc[t.color]) acc[t.color] = [];
+      acc[t.color].push({ date: d.date, tag: t });
+    });
+    return acc;
+  },{});
+
+  // Walk through each incoming group to push dead ones onto it's dead list:
+  _.each(incoming, (group,index) => {
+    if (!group.tag_ranges) return;
+    state.set(['app', 'records', 'incoming', index, 'dead'], _.reduce(group.tag_ranges, (acc,r) => {
+      _.each(dead[r.start.color], deadone => {
+        if (!rangeContainsTag(r, deadone.tag)) return;
+        acc.push(deadone); // otherwise, it's in the range so count it
+      });
+      return acc;
+    },[]));
+  });
+
 }
 
 export function recordToTreatmentCardOutput({state,output}) {
@@ -227,8 +264,8 @@ export function updateRecord({input,state}) {
     state.set('app.record.tag.color', input.tag.color);
     if (input.tag.color === 'NOTAG') state.set('app.record.tag.number','1');
   }
-  if (input.tag && typeof input.tag.number === 'string') {
-    state.set('app.record.tag.number', input.tag.number);
+  if (input.tag && (typeof input.tag.number === 'string' || typeof input.tag.number === 'number')) {
+    state.set('app.record.tag.number', +(input.tag.number));
   }
   state.set('app.record.is_saved', false);
 }

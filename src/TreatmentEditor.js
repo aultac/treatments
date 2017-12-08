@@ -42,7 +42,7 @@ export default connect({
   const recentCodesFromRecords = () => {
     const sorted = _.reverse(_.sortBy(props.treatmentRecords,[ r => r.date, r => r.dateLastActivity ]));
     return _.reduce(sorted,(acc,r) => {
-      if (acc.length >= 13) return acc; // only get 5 most recent
+      if (acc.length >= 5) return acc; // only get 5 most recent
       if (_.includes(acc,r.treatment)) return acc;
       acc.push(r.treatment);
       return acc;

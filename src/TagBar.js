@@ -17,7 +17,7 @@ export default connect({
 
   const tagNumberTextChanged = evt => {
     evt.preventDefault();
-    props.recordUpdateRequested({tag: { number: evt.target.value} });
+    props.recordUpdateRequested({tag: { number: +(evt.target.value)} });
   };
 
   const color = props.colors[props.record.tag.color];
@@ -30,7 +30,7 @@ export default connect({
              type="text"
              onChange={colorTextChanged} />
       <input className="numbertext"
-             value={props.record.tag.number} 
+             value={props.record.tag.number || ''} 
              type="text" 
              onChange={tagNumberTextChanged} />
     </div>

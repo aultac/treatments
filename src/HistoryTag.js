@@ -17,18 +17,27 @@ export default connect({
     );}
   );
   recordsfortag = _.reverse(_.sortBy(recordsfortag,r=>r.date));
+  let prevdays = -1; // keeps track of previous days in mapper
   return (
     <div className="historytag">
-      {_.map(recordsfortag, (r,i) => 
+      {_.map(recordsfortag, (r,i) => {
+        const days = moment().diff(moment(r.date,'YYYY-MM-DD'), 'days');
+        let daystr = days + ' days ago';
+        if (days === 0) daystr = 'today';
+        if (days === 1) daystr = 'yesterday';
+        let prevstr = '(+'+(days-prevdays)+')';
+        if (prevdays < 0) prevstr = '';
+        prevdays = days;
+        return (
         <div className="historytagentry" key={'historyline'+i}>
           <div className="historytreatment">
             {r.treatment}
           </div>
           <div className="historyduration">
-            {moment(r.date,'YYYY-MM-DD').fromNow()}
+            { daystr } { prevstr }
           </div>
         </div>
-      )}
+      )})}
     </div>
   );
 });
