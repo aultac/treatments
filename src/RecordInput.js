@@ -32,14 +32,15 @@ export default connect({
     props.recordUpdateRequested({ tag: { number: +(str) } });
   };
 
+  const canSave = props.cardsValid && props.record.tag && props.record.tag.number && props.record.tag.color;
+
   const recordSaveClicked = evt => {
-    if (props.canSave) {
+    if (canSave) {
       evt.preventDefault();
       props.recordSaveClicked();
     }
   };
 
-  const canSave = props.cardsValid && props.record.tag && props.record.tag.number && props.record.tag.color;
   return (
     <div className="recordinput">
 
